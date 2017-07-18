@@ -1,0 +1,12 @@
+---
+:sources:
+  :time_tech:
+    :base: http://time.com/section/tech
+  :facebook_blog:
+    :base: https://code.facebook.com
+  :google_blog:
+    :base: https://blog.google
+  :twilio_press:
+    :base: https://twilio.com/press/releases
+  :twilio_news:
+    :base: https://twilio.com/press/coverage
