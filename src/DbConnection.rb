@@ -19,7 +19,7 @@ class DbConnection
 
   def insert source
     @name = source[:name]
-    @base_url = source[:base_url]
+    @article_base_url = source[:article_base_url]
     @articles = source[:articles]
 
     $logger.info("Checking if table exists: #{@name}")
@@ -43,7 +43,7 @@ class DbConnection
   def _insert
     @articles.each do |article|
       begin
-        full_url = "#{@base_url}/#{article[:link]}"
+        full_url = @article_base_url + article[:link]
         $logger.info("Inserting #{article[:name]} and #{full_url} into #{@name}")
         @connection.exec "INSERT INTO \"#{@name}\" VALUES ('\"#{article[:name].gsub("'", %q(''))}\"', '\"#{full_url}\"');"
       rescue => e

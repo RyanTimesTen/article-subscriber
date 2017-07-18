@@ -1,6 +1,6 @@
 namespace :scrape do
 
-  desc 'Test scraper'
+  desc 'Scrape only the given source'
   task :source, [:source] do |t, args|
 
     $logger.info('Running `rake scrape:source`')
@@ -10,6 +10,7 @@ namespace :scrape do
     end
 
     begin
+      $db = DbConnection.new
       source_name = args[:source]
       $logger.info("Using source: #{source_name}")
 
@@ -17,6 +18,7 @@ namespace :scrape do
     rescue => e
       $logger.error("An error occurred: #{e}")
     ensure
+      $db.disconnect
       $logger.close
     end
 
@@ -24,20 +26,20 @@ namespace :scrape do
 
   def scrape source_name
     begin
-      source = { :name => source_name, :base_url => parse_for_url(source_name) }
+      base_url, article_base_url = parse_for_urls(source_name)
+      source = { :name => source_name, :base_url => base_url, :article_base_url => article_base_url }
       source[:articles] = Parser.parse_html source
-      db = DbConnection.new
-      db.insert source
-      db.disconnect
+      
+      $db.insert source
     rescue
     end
   end
 
-  def parse_for_url source_name
+  def parse_for_urls source_name
     $logger.info('Attempting to load sources.yml')
     begin
       sources = load_sources
-      sources[source_name.to_sym][:base]
+      return sources[source_name.to_sym][:base], sources[source_name.to_sym][:article_base]
     rescue => e
       raise e
     end

@@ -2,11 +2,16 @@
 :sources:
   :time_tech:
     :base: http://time.com/section/tech
+    :article_base: http://time.com
   :facebook_blog:
     :base: https://code.facebook.com
+    :article_base: http://time.com  # TODO: Update
   :google_blog:
     :base: https://blog.google
+    :article_base: http://time.com  # TODO: Update
   :twilio_press:
     :base: https://twilio.com/press/releases
+    :article_base: http://time.com  # TODO: Update
   :twilio_news:
     :base: https://twilio.com/press/coverage
+    :article_base: http://time.com  # TODO: Update
