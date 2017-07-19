@@ -5,13 +5,10 @@
     :article_base: http://time.com
   :facebook_blog:
     :base: https://code.facebook.com
-    :article_base: http://time.com  # TODO: Update
+    :article_base: https://code.facebook.com
   :google_blog:
     :base: https://blog.google
-    :article_base: http://time.com  # TODO: Update
+    :article_base: https://blog.google
   :twilio_press:
     :base: https://twilio.com/press/releases
-    :article_base: http://time.com  # TODO: Update
-  :twilio_news:
-    :base: https://twilio.com/press/coverage
-    :article_base: http://time.com  # TODO: Update
+    :article_base: https://twilio.com
