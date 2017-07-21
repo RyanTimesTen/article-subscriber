@@ -32,7 +32,7 @@ class DbConnection
 
   def table_exists
     result = @connection.exec "SELECT EXISTS (SELECT 1 FROM pg_tables WHERE tablename='#{@name}');"
-    result[0]['exists'] == 't' ? true : false
+    result.first['exists'] == 't' ? true : false
   end
 
   def create_table

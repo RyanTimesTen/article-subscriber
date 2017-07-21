@@ -8,10 +8,10 @@
     :base: https://code.facebook.com
     :article_base: https://code.facebook.com
     :xpath: //div[@class="_5mr _iuj _cql"]//a
-  :google-blog:
-    :base: https://blog.google
-    :article_base: https://blog.google
-    :xpath: 
+  # :google-blog:
+  #   :base: https://blog.google
+  #   :article_base: https://blog.google
+  #   :xpath: 
   :twilio-press:
     :base: https://twilio.com/press/releases
     :article_base: https://twilio.com
