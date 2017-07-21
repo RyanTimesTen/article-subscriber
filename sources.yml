@@ -1,14 +1,22 @@
 ---
 :sources:
-  :time_tech:
+  :time-tech:
     :base: http://time.com/section/tech
     :article_base: http://time.com
-  :facebook_blog:
+    :xpath: //div[@class="row _1An5xv1b"]//a[@target="_self"]
+  :facebook-blog:
     :base: https://code.facebook.com
     :article_base: https://code.facebook.com
-  :google_blog:
+    :xpath: //div[@class="_5mr _iuj _cql"]//a
+  :google-blog:
     :base: https://blog.google
     :article_base: https://blog.google
-  :twilio_press:
+    :xpath: 
+  :twilio-press:
     :base: https://twilio.com/press/releases
     :article_base: https://twilio.com
+    :xpath: //div[@class="column-5-6 "]//a
+  :twilio-blog:
+    :base: https://www.twilio.com/blog
+    :article_base: ''
+    :xpath: '//h2[@class="entry-title"]//a'

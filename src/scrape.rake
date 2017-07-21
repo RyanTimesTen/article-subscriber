@@ -26,19 +26,24 @@ namespace :scrape do
   end
 
   def scrape source_name
-    base_url, article_base_url = parse_for_urls(source_name)
+    base_url, article_base_url, xpath = parse_sources_yaml source_name
 
-    source = { :name => source_name, :base_url => base_url, :article_base_url => article_base_url }
+    source = {
+      :name => source_name,
+      :base_url => base_url,
+      :article_base_url => article_base_url,
+      :xpath => xpath
+    }
 
-    source[:articles] = Parser.new.send(source[:name].to_sym, source)
+    source[:articles] = Parser.parse source
     
     source
   end
 
-  def parse_for_urls source_name
+  def parse_sources_yaml source_name
     $logger.info('Attempting to load sources.yml')
     sources = load_sources
-    return sources[source_name.to_sym][:base], sources[source_name.to_sym][:article_base]
+    return sources[source_name.to_sym][:base], sources[source_name.to_sym][:article_base], sources[source_name.to_sym][:xpath]
   end
 
 end
