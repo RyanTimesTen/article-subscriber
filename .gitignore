@@ -3,6 +3,9 @@ log/
 
 nokotest.rb
 
+# IntelliJ
+.idea
+
 # Build output
 api/build
 api/.gradle
