@@ -2,3 +2,7 @@
 log/
 
 nokotest.rb
+
+# Build output
+api/build
+api/.gradle
