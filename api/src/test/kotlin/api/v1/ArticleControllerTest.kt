@@ -104,13 +104,23 @@ class ArticleControllerTest : ShouldSpec() {
                         }
                     }
                 }
+
+                "for 0 articles" {
+                    should("respond with no articles") {
+                        val response = ArticleController().get(ANY)
+
+                        response.total shouldBe 0
+
+                        response.articles.size shouldBe 0
+                    }
+                }
             }
 
             "given an improper request" {
-                "where the number of articles is less than 1" {
+                "where the number of articles is less than 0" {
                     should("throw an invalid number exception") {
                         shouldThrow<Exception> {
-                            ArticleController().get(ANY, number = 0)
+                            ArticleController().get(ANY, number = 1)
                         }
                     }
                 }
