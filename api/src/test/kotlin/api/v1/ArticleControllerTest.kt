@@ -120,7 +120,7 @@ class ArticleControllerTest : ShouldSpec() {
                 "where the number of articles is less than 0" {
                     should("throw an invalid number exception") {
                         shouldThrow<Exception> {
-                            ArticleController().get(ANY, number = 1)
+                            ArticleController().get(ANY, number = -1)
                         }
                     }
                 }
