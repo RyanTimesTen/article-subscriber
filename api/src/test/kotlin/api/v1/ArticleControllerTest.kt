@@ -106,9 +106,11 @@ class ArticleControllerTest : ShouldSpec() {
                         response.articles.size shouldBe 0
                     }
                 }
+
             }
 
             "given an improper request" {
+
                 "where the number of articles is less than 0" {
                     should("throw an invalid number exception") {
                         shouldThrow<Exception> {
@@ -124,6 +126,7 @@ class ArticleControllerTest : ShouldSpec() {
                         }
                     }
                 }
+                
             }
 
         }
