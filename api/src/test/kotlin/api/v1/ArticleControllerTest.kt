@@ -46,20 +46,6 @@ class ArticleControllerTest : ShouldSpec() {
                     }
                 }
 
-                "for multiple articles from any source" {
-                    should("respond with the given amount of articles from random sources") {
-                        val response = ArticleController().get(ANY, number = 5)
-
-                        val sources = mutableListOf<String>()
-
-                        response.articles.forEach { article ->
-                            sources.add(article.source)
-                        }
-
-                        sources.size shouldNotBe sources.toSet().size
-                    }
-                }
-
                 "for an article from a specified source" {
                     should("respond with one article from that source") {
                         SOURCES.forEach { source ->
@@ -99,7 +85,7 @@ class ArticleControllerTest : ShouldSpec() {
 
                 "for 0 articles" {
                     should("respond with no articles") {
-                        val response = ArticleController().get(ANY)
+                        val response = ArticleController().get(ANY, number = 0)
 
                         response.total shouldBe 0
 
@@ -113,7 +99,7 @@ class ArticleControllerTest : ShouldSpec() {
 
                 "where the number of articles is less than 0" {
                     should("throw an invalid number exception") {
-                        shouldThrow<Exception> {
+                        shouldThrow<IllegalArgumentException> {
                             ArticleController().get(ANY, number = -1)
                         }
                     }
@@ -121,12 +107,12 @@ class ArticleControllerTest : ShouldSpec() {
 
                 "with an invalid source" {
                     should("throw an invalid source exception") {
-                        shouldThrow<Exception> {
+                        shouldThrow<IllegalArgumentException> {
                             ArticleController().get("invalid-source")
                         }
                     }
                 }
-                
+
             }
 
         }

@@ -3,6 +3,7 @@ package api.v1
 import mu.KotlinLogging
 import org.springframework.web.bind.annotation.*
 import java.sql.*
+import java.util.Random
 
 val JDBC_DRIVER = "org.postgresql.Driver"
 val DB_URL = "jdbc:postgresql://localhost:5432/article-subscriber"
@@ -15,25 +16,15 @@ private val logger = KotlinLogging.logger {}
 @RestController
 class ArticleController {
     @GetMapping(value = "/api/v1/article/{source}")
-    fun get(@PathVariable("source") source: String, @RequestParam(name = "number", defaultValue = "1") number: Int = 1): ArticleResponse {
-        if (PG_USER == null || PG_PASS == null) {
-            val e = "Unable to retrieve database username or password"
-            logger.error { e }
-            throw NullPointerException(e)
-        }
+    fun get(@PathVariable("source") sourceOrAny: String, @RequestParam(name = "number", defaultValue = "1") number: Int = 1): ArticleResponse {
+        checkForErrors(sourceOrAny, number)
 
-        if (!SOURCES.contains(source)) {
-            val e = "Invalid source: [$source]"
-            logger.error { e }
-            throw IllegalArgumentException(e)
-        }
+        val articles = queryDatabaseForArticlesFrom(getSource(sourceOrAny), number)
 
-        if (number < 0) {
-            val e = "Invalid number: [$number]"
-            logger.error { e }
-            throw IllegalArgumentException(e)
-        }
+        return ArticleResponse(articles.size, articles)
+    }
 
+    private fun queryDatabaseForArticlesFrom(source: String, number: Int): List<Article> {
         val articles: MutableList<Article> = mutableListOf()
 
         var connection: Connection? = null
@@ -53,16 +44,7 @@ class ArticleController {
 
             result = statement!!.executeQuery(query)
 
-            if (result != null) {
-                while (result.next()) {
-                    val name = result.getString("name")
-                    val link = result.getString("link")
-//                    val source = result.getString("source")
-
-                    logger.info { "Adding article with name: [$name], link: [$link], and source: [$source]" }
-                    articles.add(Article(name, link, source))
-                }
-            }
+            addArticles(articles, source, result)
         } catch (e: SQLException) {
             logger.error { "SQL error occured: ${e.printStackTrace()}" }
             throw SQLException()
@@ -70,19 +52,49 @@ class ArticleController {
             logger.error { "Error occured: ${e.printStackTrace()}" }
             throw Exception()
         } finally {
-            if (result != null) {
-                result.close()
-            }
-
-            if (statement != null) {
-                statement.close()
-            }
-
-            if (connection != null) {
-                connection.close()
-            }
+            result?.close()
+            statement?.close()
+            connection?.close()
         }
 
-        return ArticleResponse(articles.size, articles)
+        return articles
+    }
+
+    private fun addArticles(articles: MutableList<Article>, source: String, result: ResultSet?) {
+        if (result != null) {
+            while (result.next()) {
+                val name = result.getString("name")
+                val link = result.getString("link")
+
+                logger.info { "Adding article with name: [$name], link: [$link], and source: [$source]" }
+                articles.add(Article(name, link, source))
+            }
+        }
+    }
+
+    private fun checkForErrors(sourceOrAny: String, number: Int) {
+        if (PG_USER == null || PG_PASS == null) {
+            val e = "Unable to retrieve database username or password"
+            logger.error { e }
+            throw NullPointerException(e)
+        }
+
+        if (!SOURCES.contains(sourceOrAny) && sourceOrAny != ANY) {
+            val e = "Invalid source: [$sourceOrAny]"
+            logger.error { e }
+            throw IllegalArgumentException(e)
+        }
+
+        if (number < 0) {
+            val e = "Invalid number: [$number]"
+            logger.error { e }
+            throw IllegalArgumentException(e)
+        }
+    }
+
+    private fun getSource(source: String) = if (source == ANY) {
+        SOURCES[Random().nextInt(SOURCES.size)]
+    } else {
+        source
     }
 }
