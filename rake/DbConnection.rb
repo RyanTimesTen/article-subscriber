@@ -45,7 +45,7 @@ class DbConnection
       begin
         full_url = @article_base_url + article[:link]
         $logger.info("Inserting #{article[:name]} and #{full_url} into #{@name}")
-        @connection.exec "INSERT INTO \"#{@name}\" VALUES ('\"#{article[:name].gsub("'", %q(''))}\"', '\"#{full_url}\"');"
+        @connection.exec "INSERT INTO \"#{@name}\" VALUES ('#{article[:name].gsub("'", %q(''))}', '#{full_url}');"
       rescue => e
         $logger.error("An error occurred: #{e}")
       end
