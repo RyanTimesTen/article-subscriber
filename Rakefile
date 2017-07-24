@@ -14,4 +14,4 @@ $logger.formatter = proc do |severity, datetime, progname, msg|
 end
 
 
-Dir.glob("#{RAKE_ROOT}/src/*").each { |r| import r }
+Dir.glob("#{RAKE_ROOT}/rake/*").each { |r| import r }
