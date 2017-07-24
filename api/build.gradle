@@ -20,13 +20,22 @@ apply plugin: 'kotlin-spring'
 repositories {
     jcenter()
     mavenCentral()
+    maven {
+        url 'https://dl.bintray.com/kotlin/exposed/org/jetbrains/exposed/exposed/0.8.3/'
+    }
 }
 
 dependencies {
+    // compile group: 'org.jetbrains.exposed', name: 'exposed', version: '0.8.3'  this should work, but doesn't >:(
+    // so I have to do this
+    compile fileTree(dir: 'lib', include: ['*.jar'])
+
+    compile 'io.github.microutils:kotlin-logging:1.4.6'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile "org.springframework.boot:spring-boot-starter-web:$spring_boot_version"
 
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    compile group: 'postgresql', name: 'postgresql', version: '9.4.1208-jdbc42-atlassian-hosted'
 
     testCompile 'io.kotlintest:kotlintest:2.0.1'
 }

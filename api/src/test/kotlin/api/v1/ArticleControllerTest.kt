@@ -7,14 +7,6 @@ import io.kotlintest.specs.ShouldSpec
 
 class ArticleControllerTest : ShouldSpec() {
 
-    private val ANY = "any"
-    private val FACEBOOK_BLOG = "facebook-blog"
-    private val TIME_TECH = "time-tech"
-    private val TWILIO_BLOG = "twilio_blog"
-    private val TWILIO_PRESS = "twilio-press"
-
-    private val SOURCES = listOf(ANY, FACEBOOK_BLOG, TIME_TECH, TWILIO_BLOG, TWILIO_PRESS)
-
     init {
 
         "The Article Controller" {
