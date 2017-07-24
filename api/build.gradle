@@ -26,10 +26,6 @@ repositories {
 }
 
 dependencies {
-    // compile group: 'org.jetbrains.exposed', name: 'exposed', version: '0.8.3'  this should work, but doesn't >:(
-    // so I have to do this
-    compile fileTree(dir: 'lib', include: ['*.jar'])
-
     compile 'io.github.microutils:kotlin-logging:1.4.6'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile "org.springframework.boot:spring-boot-starter-web:$spring_boot_version"
