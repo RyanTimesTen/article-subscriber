@@ -24,7 +24,7 @@ class ArticleControllerTest : ShouldSpec() {
                             article.name shouldNotBe null
                             article.link shouldNotBe null
 
-                            article.source shouldBe ANY
+                            SOURCES.contains(article.source) shouldBe true
                         }
                     }
                 }
@@ -40,7 +40,7 @@ class ArticleControllerTest : ShouldSpec() {
                             article.name shouldNotBe null
                             article.link shouldNotBe null
 
-                            article.source shouldBe ANY
+                            SOURCES.contains(article.source) shouldBe true
                         }
 
                     }
