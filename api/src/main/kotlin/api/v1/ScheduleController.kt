@@ -1,30 +1,32 @@
 package api.v1
 
+import com.google.gson.JsonObject
 import mu.KotlinLogging
 import org.springframework.web.bind.annotation.*
 import java.sql.*
 
 @RestController
 class ScheduleController {
+
     private val logger = KotlinLogging.logger {}
 
     @GetMapping(value = "/api/v1/schedule{phoneNumber}")
-    fun get() {
-
+    fun get(@PathVariable("phoneNumber") phoneNumber: String): ScheduleResponse {
+        return ScheduleResponse(0, emptyList())
     }
 
     @PostMapping(value = "/api/v1/schedule{phoneNumber}")
-    fun post() {
-
+    fun post(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody schedule: Schedule): ScheduleResponse {
+        return ScheduleResponse(0, emptyList())
     }
 
     @PutMapping(value = "/api/v1/schedule{phoneNumber}")
-    fun put() {
-
+    fun put(@PathVariable("phoneNumber") phoneNumber: String): ScheduleResponse {
+        return ScheduleResponse(0, emptyList())
     }
 
     @DeleteMapping(value = "/api/v1/schedule{phoneNumber}")
-    fun delete() {
-
+    fun delete(@PathVariable("phoneNumber") phoneNumber: String): JsonObject {
+        return JsonObject()
     }
 }

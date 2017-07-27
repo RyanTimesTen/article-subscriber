@@ -17,12 +17,22 @@ apply plugin: 'kotlin'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'kotlin-spring'
 
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'api.v1.AppKt'
+    }
+    baseName = project.name + '-fat'
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 repositories {
     jcenter()
     mavenCentral()
-    maven {
-        url 'https://dl.bintray.com/kotlin/exposed/org/jetbrains/exposed/exposed/0.8.3/'
-    }
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
 }
 
 dependencies {
