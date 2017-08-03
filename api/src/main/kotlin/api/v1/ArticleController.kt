@@ -5,16 +5,10 @@ import org.springframework.web.bind.annotation.*
 import java.sql.*
 import java.util.Random
 
-val JDBC_DRIVER = "org.postgresql.Driver"
-val DB_URL = "jdbc:postgresql://localhost:5432/article-subscriber"
-
-val PG_USER: String? = System.getenv("PG_USER")
-val PG_PASS: String? = System.getenv("PG_PASS")
-
-private val logger = KotlinLogging.logger {}
-
 @RestController
 class ArticleController {
+    private val logger = KotlinLogging.logger {}
+
     @GetMapping(value = "/api/v1/article/{source}")
     fun get(@PathVariable("source") sourceOrAny: String, @RequestParam(name = "number", defaultValue = "1") number: Int = 1): ArticleResponse {
         checkForErrors(sourceOrAny, number)

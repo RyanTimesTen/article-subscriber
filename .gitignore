@@ -10,3 +10,6 @@ nokotest.rb
 api/build
 api/.gradle
 api/out
+
+# AWS key
+ArticleSubscriber1.pem
