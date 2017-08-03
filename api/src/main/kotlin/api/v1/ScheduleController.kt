@@ -21,12 +21,11 @@ class ScheduleController {
     }
 
     @PutMapping(value = "/api/v1/schedule{phoneNumber}")
-    fun put(@PathVariable("phoneNumber") phoneNumber: String): ScheduleResponse {
+    fun put(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody schedule: Schedule): ScheduleResponse {
         return ScheduleResponse(0, emptyList())
     }
 
     @DeleteMapping(value = "/api/v1/schedule{phoneNumber}")
-    fun delete(@PathVariable("phoneNumber") phoneNumber: String): JsonObject {
-        return JsonObject()
+    fun delete(@PathVariable("phoneNumber") phoneNumber: String) {
     }
 }
