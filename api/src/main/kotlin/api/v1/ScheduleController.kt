@@ -1,9 +1,9 @@
 package api.v1
 
 import com.google.gson.*
+import java.sql.*
 import mu.KotlinLogging
 import org.springframework.web.bind.annotation.*
-import java.sql.*
 
 @RestController
 class ScheduleController {
@@ -21,6 +21,8 @@ class ScheduleController {
     private val START_KEY = "start"
     private val END_KEY = "end"
 
+    private val EXISTS_KEY = "exists"
+
     @GetMapping(value = "/api/v1/schedule/{phoneNumber}", produces = arrayOf("application/json"))
     fun get(@PathVariable("phoneNumber") phoneNumber: String): ScheduleResponse {
         validatePhoneNumber(phoneNumber)
@@ -31,12 +33,20 @@ class ScheduleController {
     }
 
     @PostMapping(value = "/api/v1/schedule/{phoneNumber}")
-    fun post(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody schedule: Schedule): ScheduleResponse {
-        return ScheduleResponse(0, emptyList())
+    fun post(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody requestSchedule: Schedule): ScheduleResponse {
+        validatePhoneNumber(phoneNumber)
+
+        checkForErrors(requestSchedule)
+
+        addScheduleToDatabase(phoneNumber, requestSchedule)
+
+        val schedules = listOf(requestSchedule)
+
+        return ScheduleResponse(schedules.size, schedules)
     }
 
     @PutMapping(value = "/api/v1/schedule/{phoneNumber}")
-    fun put(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody schedule: Schedule): ScheduleResponse {
+    fun put(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody requestSchedule: Schedule): ScheduleResponse {
         return ScheduleResponse(0, emptyList())
     }
 
@@ -49,6 +59,29 @@ class ScheduleController {
             val e = "Invalid phone number: [$phoneNumber]"
             throw IllegalArgumentException(e)
         }
+    }
+
+    private fun checkForErrors(schedule: Schedule) {
+        if (schedule.days.end.integerRepresentation() < schedule.days.start.integerRepresentation()) {
+            val e = "Start day must come before end day"
+            throw IllegalArgumentException(e)
+        }
+
+        if (schedule.hours.end < schedule.hours.start) {
+            val e = "Start hour must come before end hour"
+            throw IllegalArgumentException(e)
+        }
+    }
+
+    fun String.integerRepresentation() = when (this) {
+        SUNDAY -> 0
+        MONDAY -> 1
+        TUESDAY -> 2
+        WEDNESDAY -> 3
+        THURSDAY -> 4
+        FRIDAY -> 5
+        SATURDAY -> 6
+        else -> -1
     }
 
     private fun queryDatabaseForSchedules(phoneNumber: String): List<Schedule> {
@@ -64,7 +97,7 @@ class ScheduleController {
 
             statement = connection!!.createStatement()
 
-            val query = "SELECT * FROM \"User\" WHERE number='$phoneNumber';"
+            val query = "SELECT schedule FROM \"User\" WHERE number='$phoneNumber';"
 
             result = statement!!.executeQuery(query)
 
@@ -110,6 +143,103 @@ class ScheduleController {
         val sources = GSON.fromJson(scheduleResult.get(SOURCES_KEY), JsonArray::class.java).map { it -> GSON.fromJson(it, String::class.java) }
 
         return Schedule(Days(dayStart, dayEnd), Hours(hourStart, hourEnd), sources)
+    }
+
+    private fun addScheduleToDatabase(phoneNumber: String, schedule: Schedule) {
+        var connection: Connection? = null
+        var statement: Statement? = null
+
+        try {
+            Class.forName(JDBC_DRIVER)
+
+            connection = DriverManager.getConnection(DB_URL, PG_USER, PG_PASS)
+            logger.info { "Successfully connected to database" }
+
+            statement = connection!!.createStatement()
+
+            if (scheduleExists(connection, phoneNumber)) {
+                logger.info { "Existing schedule found for phone number: [$phoneNumber]. Deleting..." }
+                removeSchedule(connection, phoneNumber)
+                logger.info { "Deleted schedule for phone number: [$phoneNumber]"}
+            }
+
+            val insert = "INSERT INTO \"User\" VALUES('$phoneNumber', '${GSON.toJson(schedule)}');"
+
+            if (statement!!.execute(insert)) {
+                logger.info { "Successfully inserted $schedule for $phoneNumber" }
+            } else {
+                logger.error { "Failed to insert $schedule for $phoneNumber" }
+            }
+        } catch (e: SQLException) {
+            logger.error { "SQL error occured: ${e.printStackTrace()}" }
+            throw SQLException()
+        } catch (e: Exception) {
+            logger.error { "Error occured: ${e.printStackTrace()}" }
+            throw Exception()
+        } finally {
+            statement?.close()
+            connection?.close()
+        }
+    }
+
+    private fun scheduleExists(connection: Connection, phoneNumber: String): Boolean {
+        var statement: Statement? = null
+        var result: ResultSet? = null
+
+        try {
+            Class.forName(JDBC_DRIVER)
+
+            statement = connection.createStatement()
+
+            val query = "SELECT EXISTS(SELECT FROM \"User\" WHERE number='$phoneNumber');"
+
+            result = statement!!.executeQuery(query)
+
+            if (result != null) {
+                while (result.next()) {
+                    return result.getString(EXISTS_KEY).equals("t")
+                }
+            }
+        } catch (e: SQLException) {
+            logger.error { "SQL error occured: ${e.printStackTrace()}" }
+            throw SQLException()
+        } catch (e: Exception) {
+            logger.error { "Error occured: ${e.printStackTrace()}" }
+            throw Exception()
+        } finally {
+            result?.close()
+            statement?.close()
+        }
+
+        return false
+    }
+
+    private fun removeSchedule(connection: Connection, phoneNumber: String) {
+        var statement: Statement? = null
+        var result: ResultSet? = null
+
+        try {
+            Class.forName(JDBC_DRIVER)
+
+            statement = connection.createStatement()
+
+            val delete = "DELETE FROM \"User\" WHERE number='$phoneNumber'"
+
+            if (statement!!.execute(delete)) {
+                logger.info { "Successfully deleted schedule for $phoneNumber "}
+            } else {
+                logger.error { "Failed to delete schedule for $phoneNumber" }
+            }
+        } catch (e: SQLException) {
+            logger.error { "SQL error occured: ${e.printStackTrace()}" }
+            throw SQLException()
+        } catch (e: Exception) {
+            logger.error { "Error occured: ${e.printStackTrace()}" }
+            throw Exception()
+        } finally {
+            result?.close()
+            statement?.close()
+        }
     }
 
 }

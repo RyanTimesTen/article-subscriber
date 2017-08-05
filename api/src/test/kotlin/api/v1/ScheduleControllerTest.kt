@@ -1,6 +1,5 @@
 package api.v1
 
-import com.google.gson.Gson
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.specs.ShouldSpec
@@ -8,41 +7,9 @@ import io.kotlintest.specs.ShouldSpec
 class ScheduleControllerTest : ShouldSpec() {
 
     private val TEST_NUMBER_WITH_SCHEDULE = "1234567890"
-    private val TEST_NUMBER_WITHOUT_SCHEUDLE = "9999999999"
+    private val TEST_NUMBER_WITHOUT_SCHEUDLE_NO_ADD = "9999999999"
+    private val TEST_NUMBER_WITHOUT_SCHEUDLE = "8888888888"
     private val INVALID_PHONE_NUMBER = "1"
-
-    private val SUNDAY = "Sunday"
-    private val MONDAY = "Monday"
-    private val TUESDAY = "Tuesday"
-    private val WEDNESDAY = "Wednesday"
-    private val THURSDAY = "Thursday"
-    private val FRIDAY = "Friday"
-    private val SATURDAY = "Saturday"
-
-    private val TWELVE_AM = 0
-    private val ONE_AM = 1
-    private val TWO_AM = 2
-    private val THREE_AM = 3
-    private val FOUR_AM = 4
-    private val FIVE_AM = 5
-    private val SIX_AM = 6
-    private val SEVEN_AM = 7
-    private val EIGHT_AM = 8
-    private val NINE_AM = 9
-    private val TEN_AM = 10
-    private val ELEVEN_AM = 11
-    private val TWELVE_PM = 12
-    private val ONE_PM = 13
-    private val TWO_PM = 14
-    private val THREE_PM = 15
-    private val FOUR_PM = 16
-    private val FIVE_PM = 17
-    private val SIX_PM = 18
-    private val SEVEN_PM = 19
-    private val EIGHT_PM = 20
-    private val NINE_PM = 21
-    private val TEN_PM = 22
-    private val ELEVEN_PM = 23
 
     init {
 
@@ -76,7 +43,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with no schedule registered for the given phone number" {
                     should("respond with no schedules") {
-                        val response = ScheduleController().get(TEST_NUMBER_WITHOUT_SCHEUDLE)
+                        val response = ScheduleController().get(TEST_NUMBER_WITHOUT_SCHEUDLE_NO_ADD)
 
                         response.total shouldBe 0
                         response.schedules.size shouldBe 0
@@ -141,7 +108,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end day that comes before the start day" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysObject(WEDNESDAY, THURSDAY), getHoursObject(ONE_AM, SIX_AM), getSources(TIME_TECH))
+                        val schedule = Schedule(getDaysObject(THURSDAY, WEDNESDAY), getHoursObject(ONE_AM, SIX_AM), getSources(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().post(TEST_NUMBER_WITHOUT_SCHEUDLE, schedule)
                         }
