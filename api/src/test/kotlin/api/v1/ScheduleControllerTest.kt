@@ -10,6 +10,7 @@ class ScheduleControllerTest : ShouldSpec() {
     override fun interceptSpec(context: Spec, spec: () -> Unit) {
         if (TEST_PHONE_NUMBERS.size == TEST_PHONE_NUMBERS.filterNotNull().size) {
             spec()
+            resetDeletedSchedule()
         } else {
             val e = "Not all test numbers were initialized"
             throw UninitializedPropertyAccessException(e)
@@ -196,9 +197,9 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with a valid number with a schedule" {
                     should("delete the schedule associated with that number") {
-                        ScheduleController().delete(TEST_NUMBER_WITH_SCHEDULE!!)
+                        ScheduleController().delete(TEST_NUMBER_WITH_SCHEDULE_TO_DELETE!!)
 
-                        val scheduleResponse = ScheduleController().get(TEST_NUMBER_WITH_SCHEDULE)
+                        val scheduleResponse = ScheduleController().get(TEST_NUMBER_WITH_SCHEDULE_TO_DELETE)
 
                         scheduleResponse.total shouldBe 0
                         scheduleResponse.schedules.size shouldBe 0
@@ -230,5 +231,5 @@ class ScheduleControllerTest : ShouldSpec() {
         }
 
     }
-    
+
 }

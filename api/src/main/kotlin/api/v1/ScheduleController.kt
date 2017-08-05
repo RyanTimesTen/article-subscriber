@@ -61,6 +61,10 @@ class ScheduleController {
 
     @DeleteMapping(value = "/api/v1/schedule/{phoneNumber}")
     fun delete(@PathVariable("phoneNumber") phoneNumber: String) {
+        checkDatabaseConstants()
+        validatePhoneNumber(phoneNumber)
+
+        deleteSchedule(phoneNumber)
     }
 
     private fun validatePhoneNumber(phoneNumber: String) {
@@ -231,6 +235,30 @@ class ScheduleController {
         }
 
         return false
+    }
+
+    private fun deleteSchedule(phoneNumber: String) {
+        var connection: Connection? = null
+
+        try {
+            Class.forName(JDBC_DRIVER)
+
+            connection = DriverManager.getConnection(DB_URL, PG_USER, PG_PASS)
+            logger.info { "Successfully connected to database" }
+
+            if (scheduleExists(connection, phoneNumber)) {
+                removeSchedule(connection, phoneNumber)
+            } else {
+                val e = "No schedule found for phone number: [$phoneNumber]"
+                logger.error { e }
+                throw IllegalArgumentException(e)
+            }
+        } catch (e: SQLException) {
+            logger.error { "SQL error occured: ${e.printStackTrace()}" }
+            throw SQLException()
+        } finally {
+            connection?.close()
+        }
     }
 
     private fun removeSchedule(connection: Connection, phoneNumber: String) {
