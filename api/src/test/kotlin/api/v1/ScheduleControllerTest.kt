@@ -43,7 +43,7 @@ class ScheduleControllerTest : ShouldSpec() {
     private val NINE_PM = 21
     private val TEN_PM = 22
     private val ELEVEN_PM = 23
-    
+
     init {
 
         "The Schedule Controller" {

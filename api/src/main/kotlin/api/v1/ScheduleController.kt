@@ -14,6 +14,13 @@ class ScheduleController {
 
     private val US_PHONE_NUMBER_LENGTH = 10
 
+    private val SCHEDULE_KEY = "schedule"
+    private val DAYS_KEY = "days"
+    private val HOURS_KEY = "hours"
+    private val SOURCES_KEY = "sources"
+    private val START_KEY = "start"
+    private val END_KEY = "end"
+
     @GetMapping(value = "/api/v1/schedule/{phoneNumber}", produces = arrayOf("application/json"))
     fun get(@PathVariable("phoneNumber") phoneNumber: String): ScheduleResponse {
         validatePhoneNumber(phoneNumber)
@@ -45,8 +52,6 @@ class ScheduleController {
     }
 
     private fun queryDatabaseForSchedules(phoneNumber: String): List<Schedule> {
-        val schedules: MutableList<Schedule> = mutableListOf()
-
         var connection: Connection? = null
         var statement: Statement? = null
         var result: ResultSet? = null
@@ -63,29 +68,7 @@ class ScheduleController {
 
             result = statement!!.executeQuery(query)
 
-            if (result != null) {
-                while (result.next()) {
-                    val scheduleResult = GSON.fromJson(result.getString("schedule"), JsonObject::class.java)
-                    logger.info { "Found schedule for number: [$phoneNumber]" }
-
-                    if (scheduleResult == null) {
-                        return emptyList()
-                    }
-
-                    val dayStart = GSON.fromJson(scheduleResult.get("days").asJsonObject.get("start"), String::class.java)
-                    val dayEnd = GSON.fromJson(scheduleResult.get("days").asJsonObject.get("end"), String::class.java)
-
-                    val hourStart = GSON.fromJson(scheduleResult.get("hours").asJsonObject.get("start"), Int::class.java)
-                    val hourEnd = GSON.fromJson(scheduleResult.get("hours").asJsonObject.get("end"), Int::class.java)
-
-                    val sources = GSON.fromJson(scheduleResult.get("sources"), JsonArray::class.java).map { it -> GSON.fromJson(it, String::class.java) }
-
-                    val days = Days(dayStart, dayEnd)
-                    val hours = Hours(hourStart, hourEnd)
-
-                    schedules.add(Schedule(days, hours, sources))
-                }
-            }
+            return parseDatabaseResponseForSchedule(result)
         } catch (e: SQLException) {
             logger.error { "SQL error occured: ${e.printStackTrace()}" }
             throw SQLException()
@@ -97,8 +80,36 @@ class ScheduleController {
             statement?.close()
             connection?.close()
         }
+    }
+
+    private fun parseDatabaseResponseForSchedule(result: ResultSet?): List<Schedule> {
+        val schedules: MutableList<Schedule> = mutableListOf()
+
+        if (result != null) {
+            while (result.next()) {
+                val scheduleResult = GSON.fromJson(result.getString(SCHEDULE_KEY), JsonObject::class.java)
+
+                scheduleResult ?: return emptyList()
+
+                logger.info { "Found schedule: [$scheduleResult]" }
+
+                schedules.add(createSchedule(scheduleResult))
+            }
+        }
 
         return schedules
+    }
+
+    private fun createSchedule(scheduleResult: JsonObject): Schedule {
+        val dayStart = GSON.fromJson(scheduleResult.get(DAYS_KEY).asJsonObject.get(START_KEY), String::class.java)
+        val dayEnd = GSON.fromJson(scheduleResult.get(DAYS_KEY).asJsonObject.get(END_KEY), String::class.java)
+
+        val hourStart = GSON.fromJson(scheduleResult.get(HOURS_KEY).asJsonObject.get(START_KEY), Int::class.java)
+        val hourEnd = GSON.fromJson(scheduleResult.get(HOURS_KEY).asJsonObject.get(END_KEY), Int::class.java)
+
+        val sources = GSON.fromJson(scheduleResult.get(SOURCES_KEY), JsonArray::class.java).map { it -> GSON.fromJson(it, String::class.java) }
+
+        return Schedule(Days(dayStart, dayEnd), Hours(hourStart, hourEnd), sources)
     }
 
 }
