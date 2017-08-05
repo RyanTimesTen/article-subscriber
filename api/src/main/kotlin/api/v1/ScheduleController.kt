@@ -25,6 +25,7 @@ class ScheduleController {
 
     @GetMapping(value = "/api/v1/schedule/{phoneNumber}", produces = arrayOf("application/json"))
     fun get(@PathVariable("phoneNumber") phoneNumber: String): ScheduleResponse {
+        checkDatabaseConstants()
         validatePhoneNumber(phoneNumber)
 
         val schedules = queryDatabaseForSchedules(phoneNumber)
@@ -34,8 +35,8 @@ class ScheduleController {
 
     @PostMapping(value = "/api/v1/schedule/{phoneNumber}")
     fun post(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody requestSchedule: Schedule): ScheduleResponse {
+        checkDatabaseConstants()
         validatePhoneNumber(phoneNumber)
-
         checkForErrors(requestSchedule)
 
         addScheduleToDatabase(phoneNumber, requestSchedule)
@@ -61,14 +62,24 @@ class ScheduleController {
         }
     }
 
+    private fun checkDatabaseConstants() {
+        if (PG_USER == null || PG_PASS == null) {
+            val e = "Unable to retrieve database username or password"
+            logger.error { e }
+            throw NullPointerException(e)
+        }
+    }
+
     private fun checkForErrors(schedule: Schedule) {
         if (schedule.days.end.integerRepresentation() < schedule.days.start.integerRepresentation()) {
             val e = "Start day must come before end day"
+            logger.error { e }
             throw IllegalArgumentException(e)
         }
 
         if (schedule.hours.end < schedule.hours.start) {
             val e = "Start hour must come before end hour"
+            logger.error { e }
             throw IllegalArgumentException(e)
         }
     }
