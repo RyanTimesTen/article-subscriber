@@ -61,30 +61,27 @@ class ScheduleControllerTest : ShouldSpec() {
 
             "given a proper GET request" {
 
-                "with a schedule Sunday-Saturday, 9AM-5PM schedule, with one source" {
+                "with a schedule Sunday-Saturday, 9AM-5PM schedule, with one source: twilio-press" {
                     should("respond with the corresponding schedule") {
                         val response = ScheduleController().get(TEST_NUMBER_WITH_SCHEDULE)
 
                         response.total shouldBe 1
                         response.schedules.size shouldBe 1
 
-                        val days = response.schedules[0].days
+                        val days = response.schedules.first().days
 
-                        days.has(DAY_START_KEY) shouldBe true
-                        days.has(DAY_END_KEY) shouldBe true
+                        days.start shouldBe SUNDAY
+                        days.end shouldBe SATURDAY
 
-                        days.get(DAY_START_KEY) shouldBe SUNDAY
-                        days.get(DAY_END_KEY) shouldBe SATURDAY
+                        val hours = response.schedules.first().hours
 
-                        val hours = response.schedules[0].hours
+                        hours.start shouldBe NINE_AM
+                        hours.end shouldBe FIVE_PM
 
-                        hours.has(HOUR_START_KEY) shouldBe true
-                        hours.has(HOUR_END_KEY) shouldBe true
+                        val sources = response.schedules.first().sources
 
-                        hours.get(HOUR_START_KEY) shouldBe NINE_AM
-                        hours.get(HOUR_END_KEY) shouldBe FIVE_PM
-
-                        response.schedules[0].sources.size() shouldBe 1
+                        sources.size shouldBe 1
+                        sources.first() shouldBe TWILIO_PRESS
                     }
                 }
 
@@ -115,7 +112,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with a Monday-Friday and 10AM-4PM schedule from two sources: time_tech and twilio_press" {
                     should("return that schedule as a response") {
-                        val schedule = Schedule(getDaysJson(MONDAY, FRIDAY), getHoursJson(TEN_AM, FOUR_PM), getSourcesJson(TIME_TECH, TWILIO_PRESS))
+                        val schedule = Schedule(getDaysObject(MONDAY, FRIDAY), getHoursObject(TEN_AM, FOUR_PM), getSources(TIME_TECH, TWILIO_PRESS))
                         val response = ScheduleController().post(TEST_NUMBER_WITHOUT_SCHEUDLE, schedule)
 
                         response.total shouldBe 1
@@ -123,26 +120,20 @@ class ScheduleControllerTest : ShouldSpec() {
 
                         val days = response.schedules[0].days
 
-                        days.has(DAY_START_KEY) shouldBe true
-                        days.has(DAY_END_KEY) shouldBe true
-
-                        days.get(DAY_START_KEY) shouldBe MONDAY
-                        days.get(DAY_END_KEY) shouldBe FRIDAY
+                        days.start shouldBe MONDAY
+                        days.end shouldBe FRIDAY
 
                         val hours = response.schedules[0].hours
 
-                        hours.has(HOUR_START_KEY) shouldBe true
-                        hours.has(HOUR_END_KEY) shouldBe true
-
-                        hours.get(HOUR_START_KEY) shouldBe TEN_AM
-                        hours.get(HOUR_END_KEY) shouldBe FOUR_PM
+                        hours.start shouldBe TEN_AM
+                        hours.end shouldBe FOUR_PM
 
                         val sources = response.schedules[0].sources
 
-                        sources.size() shouldBe 2
+                        sources.size shouldBe 2
 
-                        sources.contains(GSON.fromJson(TIME_TECH, JsonElement::class.java)) shouldBe true
-                        sources.contains(GSON.fromJson(TWILIO_PRESS, JsonElement::class.java)) shouldBe true
+                        sources.contains(TIME_TECH) shouldBe true
+                        sources.contains(TWILIO_PRESS) shouldBe true
                     }
                 }
 
@@ -152,7 +143,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an invalid phone number" {
                     should("throw an invalid phone number exception") {
-                        val schedule = Schedule(getDaysJson(TUESDAY, THURSDAY), getHoursJson(SIX_PM, ELEVEN_PM), getSourcesJson(TIME_TECH))
+                        val schedule = Schedule(getDaysObject(TUESDAY, THURSDAY), getHoursObject(SIX_PM, ELEVEN_PM), getSources(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().post(INVALID_PHONE_NUMBER, schedule)
                         }
@@ -161,7 +152,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end day that comes before the start day" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysJson(WEDNESDAY, THURSDAY), getHoursJson(ONE_AM, SIX_AM), getSourcesJson(TIME_TECH))
+                        val schedule = Schedule(getDaysObject(WEDNESDAY, THURSDAY), getHoursObject(ONE_AM, SIX_AM), getSources(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().post(TEST_NUMBER_WITHOUT_SCHEUDLE, schedule)
                         }
@@ -170,7 +161,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end hour that comes before the start hour" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysJson(WEDNESDAY, SATURDAY), getHoursJson(TWO_AM, TWELVE_AM), getSourcesJson(TIME_TECH))
+                        val schedule = Schedule(getDaysObject(WEDNESDAY, SATURDAY), getHoursObject(TWO_AM, TWELVE_AM), getSources(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().post(TEST_NUMBER_WITHOUT_SCHEUDLE, schedule)
                         }
@@ -183,7 +174,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with a Tuesday-Satuday and 5AM-11AM schedule from facebook_blog" {
                     should("return that schedule as a response") {
-                        val schedule = Schedule(getDaysJson(TUESDAY, SATURDAY), getHoursJson(FIVE_AM, ELEVEN_AM), getSourcesJson(FACEBOOK_BLOG))
+                        val schedule = Schedule(getDaysObject(TUESDAY, SATURDAY), getHoursObject(FIVE_AM, ELEVEN_AM), getSources(FACEBOOK_BLOG))
                         val response = ScheduleController().put(TEST_NUMBER_WITH_SCHEDULE, schedule)
 
                         response.total shouldBe 1
@@ -191,25 +182,19 @@ class ScheduleControllerTest : ShouldSpec() {
 
                         val days = response.schedules[0].days
 
-                        days.has(DAY_START_KEY) shouldBe true
-                        days.has(DAY_END_KEY) shouldBe true
-
-                        days.get(DAY_START_KEY) shouldBe TUESDAY
-                        days.get(DAY_END_KEY) shouldBe SATURDAY
+                        days.start shouldBe TUESDAY
+                        days.end shouldBe SATURDAY
 
                         val hours = response.schedules[0].hours
-
-                        hours.has(HOUR_START_KEY) shouldBe true
-                        hours.has(HOUR_END_KEY) shouldBe true
-
-                        hours.get(HOUR_START_KEY) shouldBe FIVE_AM
-                        hours.get(HOUR_END_KEY) shouldBe ELEVEN_AM
+                        
+                        hours.start shouldBe FIVE_AM
+                        hours.end shouldBe ELEVEN_AM
 
                         val sources = response.schedules[0].sources
 
-                        sources.size() shouldBe 1
+                        sources.size shouldBe 1
 
-                        sources.contains(GSON.fromJson(FACEBOOK_BLOG, JsonElement::class.java)) shouldBe true
+                        sources.contains(FACEBOOK_BLOG) shouldBe true
                     }
                 }
 
@@ -219,7 +204,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an invalid phone number" {
                     should("throw an invalid phone number exception") {
-                        val schedule = Schedule(getDaysJson(TUESDAY, THURSDAY), getHoursJson(SIX_PM, ELEVEN_PM), getSourcesJson(TIME_TECH))
+                        val schedule = Schedule(getDaysObject(TUESDAY, THURSDAY), getHoursObject(SIX_PM, ELEVEN_PM), getSources(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().put(INVALID_PHONE_NUMBER, schedule)
                         }
@@ -228,7 +213,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end day that comes before the start day" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysJson(WEDNESDAY, THURSDAY), getHoursJson(ONE_AM, SIX_AM), getSourcesJson(TIME_TECH))
+                        val schedule = Schedule(getDaysObject(WEDNESDAY, THURSDAY), getHoursObject(ONE_AM, SIX_AM), getSources(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().put(TEST_NUMBER_WITHOUT_SCHEUDLE, schedule)
                         }
@@ -237,7 +222,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end hour that comes before the start hour" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysJson(WEDNESDAY, SATURDAY), getHoursJson(TWO_AM, TWELVE_AM), getSourcesJson(TIME_TECH))
+                        val schedule = Schedule(getDaysObject(WEDNESDAY, SATURDAY), getHoursObject(TWO_AM, TWELVE_AM), getSources(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().put(TEST_NUMBER_WITHOUT_SCHEUDLE, schedule)
                         }
@@ -285,15 +270,16 @@ class ScheduleControllerTest : ShouldSpec() {
 
     }
 
-    private fun getDaysJson(start: String, end: String) = GSON.fromJson("""{"start": $start,"end": $end}""", JsonObject::class.java)
+    private fun getDaysObject(start: String, end: String) = Days(start, end)
 
-    private fun getHoursJson(start: Int, end: Int) = GSON.fromJson("""{"start": $start,"end": $end}""", JsonObject::class.java)
+    private fun getHoursObject(start: Int, end: Int) = Hours(start, end)
 
-    private fun getSourcesJson(vararg sources: String): JsonArray {
-        val sourcesArray = GSON.fromJson("[]", JsonArray::class.java)
-        sources.forEach { source ->
-            sourcesArray.add(source)
+    private fun getSources(vararg inputSources: String): List<String> {
+        val sources = mutableListOf<String>()
+        inputSources.forEach { inputSource ->
+            sources.add(inputSource)
         }
-        return sourcesArray
+        return sources
     }
+ 
 }

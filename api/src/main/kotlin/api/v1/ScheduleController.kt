@@ -12,6 +12,8 @@ class ScheduleController {
 
     private val GSON = Gson()
 
+    private val US_PHONE_NUMBER_LENGTH = 10
+
     @GetMapping(value = "/api/v1/schedule/{phoneNumber}", produces = arrayOf("application/json"))
     fun get(@PathVariable("phoneNumber") phoneNumber: String): ScheduleResponse {
         validatePhoneNumber(phoneNumber)
@@ -36,39 +38,9 @@ class ScheduleController {
     }
 
     private fun validatePhoneNumber(phoneNumber: String) {
-        var connection: Connection? = null
-        var statement: Statement? = null
-        var result: ResultSet? = null
-
-        try {
-            Class.forName(JDBC_DRIVER)
-
-            connection = DriverManager.getConnection(DB_URL, PG_USER, PG_PASS)
-            logger.info { "Successfully connected to database" }
-
-            statement = connection!!.createStatement()
-
-            val query = "SELECT EXISTS(SELECT FROM \"User\" WHERE number='$phoneNumber');"
-
-            result = statement!!.executeQuery(query)
-
-            if (result != null) {
-                while (result.next()) {
-                    val exists = result.getString("exists")
-
-                    if (exists == "f") {
-                        val e = "No schedule for phone number: [$phoneNumber]"
-                        throw IllegalArgumentException(e)
-                    }
-                }
-            }
-        } catch (e: SQLException) {
-            logger.error { "SQL error occured: ${e.printStackTrace()}" }
-            throw SQLException()
-        } finally {
-            result?.close()
-            statement?.close()
-            connection?.close()
+        if (phoneNumber.length != US_PHONE_NUMBER_LENGTH) {
+            val e = "Invalid phone number: [$phoneNumber]"
+            throw IllegalArgumentException(e)
         }
     }
 
@@ -95,6 +67,10 @@ class ScheduleController {
                 while (result.next()) {
                     val scheduleResult = GSON.fromJson(result.getString("schedule"), JsonObject::class.java)
                     logger.info { "Found schedule for number: [$phoneNumber]" }
+
+                    if (scheduleResult == null) {
+                        return emptyList()
+                    }
 
                     val dayStart = GSON.fromJson(scheduleResult.get("days").asJsonObject.get("start"), String::class.java)
                     val dayEnd = GSON.fromJson(scheduleResult.get("days").asJsonObject.get("end"), String::class.java)
