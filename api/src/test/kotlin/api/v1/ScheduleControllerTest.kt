@@ -43,15 +43,7 @@ class ScheduleControllerTest : ShouldSpec() {
     private val NINE_PM = 21
     private val TEN_PM = 22
     private val ELEVEN_PM = 23
-
-    private val DAY_START_KEY = "start"
-    private val DAY_END_KEY = "end"
-
-    private val HOUR_START_KEY = "start"
-    private val HOUR_END_KEY = "end"
-
-    val GSON = Gson()
-
+    
     init {
 
         "The Schedule Controller" {
