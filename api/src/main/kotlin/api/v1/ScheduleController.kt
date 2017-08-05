@@ -48,7 +48,15 @@ class ScheduleController {
 
     @PutMapping(value = "/api/v1/schedule/{phoneNumber}")
     fun put(@PathVariable("phoneNumber") phoneNumber: String, @RequestBody requestSchedule: Schedule): ScheduleResponse {
-        return ScheduleResponse(0, emptyList())
+        checkDatabaseConstants()
+        validatePhoneNumber(phoneNumber)
+        checkForErrors(requestSchedule)
+
+        addScheduleToDatabase(phoneNumber, requestSchedule)
+
+        val schedules = listOf(requestSchedule)
+
+        return ScheduleResponse(schedules.size, schedules)
     }
 
     @DeleteMapping(value = "/api/v1/schedule/{phoneNumber}")

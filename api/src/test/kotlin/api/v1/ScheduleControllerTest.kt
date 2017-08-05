@@ -73,7 +73,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with a Monday-Friday and 10AM-4PM schedule from two sources: time_tech and twilio_press" {
                     should("return that schedule as a response") {
-                        val schedule = Schedule(getDaysObject(MONDAY, FRIDAY), getHoursObject(TEN_AM, FOUR_PM), listOf(TIME_TECH, TWILIO_PRESS))
+                        val schedule = Schedule(Days(MONDAY, FRIDAY), Hours(TEN_AM, FOUR_PM), listOf(TIME_TECH, TWILIO_PRESS))
                         val response = ScheduleController().post(TEST_NUMBER_WITHOUT_SCHEDULE!!, schedule)
 
                         response.total shouldBe 1
@@ -104,7 +104,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an invalid phone number" {
                     should("throw an invalid phone number exception") {
-                        val schedule = Schedule(getDaysObject(TUESDAY, THURSDAY), getHoursObject(SIX_PM, ELEVEN_PM), listOf(TIME_TECH))
+                        val schedule = Schedule(Days(TUESDAY, THURSDAY), Hours(SIX_PM, ELEVEN_PM), listOf(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().post(INVALID_PHONE_NUMBER!!, schedule)
                         }
@@ -113,7 +113,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end day that comes before the start day" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysObject(THURSDAY, WEDNESDAY), getHoursObject(ONE_AM, SIX_AM), listOf(TIME_TECH))
+                        val schedule = Schedule(Days(THURSDAY, WEDNESDAY), Hours(ONE_AM, SIX_AM), listOf(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().post(TEST_NUMBER_WITHOUT_SCHEDULE!!, schedule)
                         }
@@ -122,7 +122,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end hour that comes before the start hour" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysObject(WEDNESDAY, SATURDAY), getHoursObject(TWO_AM, TWELVE_AM), listOf(TIME_TECH))
+                        val schedule = Schedule(Days(WEDNESDAY, SATURDAY), Hours(TWO_AM, TWELVE_AM), listOf(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().post(TEST_NUMBER_WITHOUT_SCHEDULE!!, schedule)
                         }
@@ -135,8 +135,8 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with a Tuesday-Satuday and 5AM-11AM schedule from facebook_blog" {
                     should("return that schedule as a response") {
-                        val schedule = Schedule(getDaysObject(TUESDAY, SATURDAY), getHoursObject(FIVE_AM, ELEVEN_AM), listOf(FACEBOOK_BLOG))
-                        val response = ScheduleController().put(TEST_NUMBER_WITH_SCHEDULE!!, schedule)
+                        val schedule = Schedule(Days(TUESDAY, SATURDAY), Hours(FIVE_AM, ELEVEN_AM), listOf(FACEBOOK_BLOG))
+                        val response = ScheduleController().put(TEST_NUMBER_WITHOUT_SCHEDULE!!, schedule)
 
                         response.total shouldBe 1
                         response.schedules.size shouldBe 1
@@ -165,7 +165,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an invalid phone number" {
                     should("throw an invalid phone number exception") {
-                        val schedule = Schedule(getDaysObject(TUESDAY, THURSDAY), getHoursObject(SIX_PM, ELEVEN_PM), listOf(TIME_TECH))
+                        val schedule = Schedule(Days(TUESDAY, THURSDAY), Hours(SIX_PM, ELEVEN_PM), listOf(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().put(INVALID_PHONE_NUMBER!!, schedule)
                         }
@@ -174,7 +174,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end day that comes before the start day" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysObject(WEDNESDAY, THURSDAY), getHoursObject(ONE_AM, SIX_AM), listOf(TIME_TECH))
+                        val schedule = Schedule(Days(SATURDAY, THURSDAY), Hours(ONE_AM, SIX_AM), listOf(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().put(TEST_NUMBER_WITHOUT_SCHEDULE!!, schedule)
                         }
@@ -183,7 +183,7 @@ class ScheduleControllerTest : ShouldSpec() {
 
                 "with an end hour that comes before the start hour" {
                     should("throw an illegal argument exception") {
-                        val schedule = Schedule(getDaysObject(WEDNESDAY, SATURDAY), getHoursObject(TWO_AM, TWELVE_AM), listOf(TIME_TECH))
+                        val schedule = Schedule(Days(WEDNESDAY, SATURDAY), Hours(TWO_AM, TWELVE_AM), listOf(TIME_TECH))
                         shouldThrow<IllegalArgumentException> {
                             ScheduleController().put(TEST_NUMBER_WITHOUT_SCHEDULE!!, schedule)
                         }
@@ -198,7 +198,7 @@ class ScheduleControllerTest : ShouldSpec() {
                     should("delete the schedule associated with that number") {
                         ScheduleController().delete(TEST_NUMBER_WITH_SCHEDULE!!)
 
-                        val scheduleResponse = ScheduleController().get(TEST_NUMBER_WITH_SCHEDULE!!)
+                        val scheduleResponse = ScheduleController().get(TEST_NUMBER_WITH_SCHEDULE)
 
                         scheduleResponse.total shouldBe 0
                         scheduleResponse.schedules.size shouldBe 0
@@ -220,7 +220,7 @@ class ScheduleControllerTest : ShouldSpec() {
                 "with a non-existent schedule" {
                     should("throw some exception") {
                         shouldThrow<IllegalArgumentException> {
-                            ScheduleController().delete(TEST_NUMBER_WITHOUT_SCHEDULE!!)
+                            ScheduleController().delete(TEST_NUMBER_WITHOUT_SCHEDULE_NO_ADD!!)
                         }
                     }
                 }
@@ -230,9 +230,5 @@ class ScheduleControllerTest : ShouldSpec() {
         }
 
     }
-
-    private fun getDaysObject(start: String, end: String) = Days(start, end)
-
-    private fun getHoursObject(start: Int, end: Int) = Hours(start, end)
-
+    
 }
