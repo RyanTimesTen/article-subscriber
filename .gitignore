@@ -5,14 +5,15 @@ nokotest.rb
 
 # IntelliJ
 .idea
+article-subscriber.iml
 
 # Build output
-api/build
-api/.gradle
-api/out
+build/
+.gradle/
+out/
 
 # AWS key
 ArticleSubscriber1.pem
 
 # API jar
-api/jar
+jar/
