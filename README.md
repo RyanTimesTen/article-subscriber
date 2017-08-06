@@ -1,4 +1,4 @@
-[![Build Status](http://34.212.250.218:8080/job/ArticleSubscriber%20API/badge/icon)](http://34.212.250.218:8080/job/ArticleSubscriber%20API/)
+[![Build Status](http://34.212.250.218:8080/buildStatus/icon?job=ArticleSubscriber%20API)](http://34.212.250.218:8080/job/ArticleSubscriber%20API/)
 
 # Article Subscriber
 
