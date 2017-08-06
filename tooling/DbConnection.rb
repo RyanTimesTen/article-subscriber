@@ -44,10 +44,10 @@ class DbConnection
     @articles.each do |article|
       begin
         full_url = @article_base_url + article[:link]
-        $logger.info("Inserting #{article[:name]} and #{full_url} into #{@name}")
         @connection.exec "INSERT INTO \"#{@name}\" VALUES ('#{article[:name].gsub("'", %q(''))}', '#{full_url}');"
+        $logger.info("Inserted #{article[:name]} and #{full_url} into #{@name}")
       rescue => e
-        $logger.error("An error occurred: #{e}")
+        $logger.error("An error occurred: #{e}") unless e.message.include? 'duplicate key'
       end
     end
   end
