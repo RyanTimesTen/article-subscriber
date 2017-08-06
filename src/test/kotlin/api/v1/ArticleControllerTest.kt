@@ -1,11 +1,21 @@
 package api.v1
 
+import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.specs.ShouldSpec
 
 class ArticleControllerTest : ShouldSpec() {
+
+    override fun interceptSpec(context: Spec, spec: () -> Unit) {
+        if (PG_USER != null && PG_USER != null) {
+            spec()
+        } else {
+            val e = "Not all environment variables were initialized"
+            throw UninitializedPropertyAccessException(e)
+        }
+    }
 
     init {
 

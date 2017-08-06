@@ -8,11 +8,11 @@ import io.kotlintest.specs.ShouldSpec
 class ScheduleControllerTest : ShouldSpec() {
 
     override fun interceptSpec(context: Spec, spec: () -> Unit) {
-        if (TEST_PHONE_NUMBERS.size == TEST_PHONE_NUMBERS.filterNotNull().size) {
+        if (TEST_PHONE_NUMBERS.size == TEST_PHONE_NUMBERS.filterNotNull().size && PG_USER != null && PG_USER != null) {
             spec()
             resetDeletedSchedule()
         } else {
-            val e = "Not all test numbers were initialized"
+            val e = "Not all environment variables were initialized"
             throw UninitializedPropertyAccessException(e)
         }
     }
