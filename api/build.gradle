@@ -31,10 +31,6 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
-}
-
 dependencies {
     compile 'io.github.microutils:kotlin-logging:1.4.6'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
@@ -51,4 +47,14 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+test {
+    testLogging {
+        afterSuite { desc, result ->
+            if (!desc.parent) {
+                println "\nTest results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+            }
+        }
+    }
 }
