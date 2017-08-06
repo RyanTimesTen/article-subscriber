@@ -13,3 +13,6 @@ api/out
 
 # AWS key
 ArticleSubscriber1.pem
+
+# API jar
+api/jar
