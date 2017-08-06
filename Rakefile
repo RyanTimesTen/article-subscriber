@@ -10,7 +10,7 @@ $logger.datetime_format = '%Y-%m-%d %H:%M:%S'
 $logger.formatter = proc do |severity, datetime, progname, msg|
   "#{severity} -- #{datetime}: #{msg}\n"
 end
-
+#
 RAKE_ROOT = File.expand_path(File.dirname(__FILE__))
 
 Dir.glob("#{RAKE_ROOT}/tooling/*.rb").each { |r| require_relative r }
