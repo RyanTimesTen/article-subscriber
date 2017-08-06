@@ -17,15 +17,6 @@ apply plugin: 'kotlin'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'kotlin-spring'
 
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Main-Class': 'api.v1.AppKt'
-    }
-    baseName = project.name + '-fat'
-    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
 repositories {
     jcenter()
     mavenCentral()
@@ -47,6 +38,15 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.build.doLast() {
+    copyJar.execute()
+}
+
+task copyJar(type: Copy) {
+    from 'build/libs/api.jar'
+    into 'jar'
 }
 
 test {
