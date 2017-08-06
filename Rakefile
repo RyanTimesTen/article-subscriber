@@ -4,6 +4,10 @@ require 'open-uri'
 require 'pg'
 require 'yaml'
 
+require_relative 'tooling/DBConnection'
+require_relative 'tooling/helpers'
+require_relative 'tooling/Parser'
+
 RAKE_ROOT = File.expand_path(File.dirname(__FILE__))
 
 $logger = Logger.new('log/logfile.log', 10, 1024000)
@@ -14,4 +18,4 @@ $logger.formatter = proc do |severity, datetime, progname, msg|
 end
 
 
-Dir.glob("#{RAKE_ROOT}/rake/*").each { |r| import r }
+Dir.glob("#{RAKE_ROOT}/tooling/rake/*").each { |r| import r }
