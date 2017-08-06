@@ -148,7 +148,7 @@ class ScheduleControllerTest : ShouldSpec() {
                         days.end shouldBe SATURDAY
 
                         val hours = response.schedules[0].hours
-                        
+
                         hours.start shouldBe FIVE_AM
                         hours.end shouldBe ELEVEN_AM
 
