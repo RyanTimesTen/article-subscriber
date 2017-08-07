@@ -23,16 +23,16 @@ class DbConnection
     @articles = source[:articles]
 
     $logger.info("Checking if table exists: #{@name}")
-    create_table if !table_exists
+    create_table if !table_exists?
 
     _insert
   end
 
   private
 
-  def table_exists
+  def table_exists?
     result = @connection.exec "SELECT EXISTS (SELECT 1 FROM pg_tables WHERE tablename='#{@name}');"
-    result.first['exists'] == 't' ? true : false
+    result.first['exists'] == 't'
   end
 
   def create_table
