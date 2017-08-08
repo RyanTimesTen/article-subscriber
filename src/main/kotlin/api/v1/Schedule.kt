@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * Representation of days over which to receive articles. Weeks are Sunday-Saturday
+ * Representation of days over which to receive articles. Weeks are Sunday-Saturday 
  *
  * @property start The starting day of the week
  * @property end The ending day of the week
