@@ -20,3 +20,7 @@
     :base: https://www.twilio.com/blog
     :article_base: ''
     :xpath: '//h2[@class="entry-title"]//a'
+  :thumbtack-blog:
+    :base: http://thumbtack.com/engineering
+    :article_base: ''
+    :xpath: //h2//a
