@@ -23,7 +23,7 @@ class DbConnection
     @articles = source[:articles]
 
     $logger.info("Checking if table exists: #{@name}")
-    create_table if !table_exists?
+    create_table unless table_exists?
 
     _insert
   end
