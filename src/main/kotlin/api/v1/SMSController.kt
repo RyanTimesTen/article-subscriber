@@ -56,9 +56,6 @@ class SMSController {
     }
 
     private fun returnArticles(source: String, latest: Boolean = false, number: Int = 1): String {
-        println(source)
-        println(latest)
-        println(number)
         if (SOURCES.contains(source)) {
             return getArticleResponseMessage(source, latest, number)
         }
