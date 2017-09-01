@@ -10,15 +10,18 @@ class ArticleController {
     private val logger = KotlinLogging.logger {}
 
     @GetMapping(value = "/api/v1/article/{source}")
-    fun get(@PathVariable("source") sourceOrAny: String, @RequestParam(name = "number", defaultValue = "1") number: Int = 1): ArticleResponse {
+    fun get(@PathVariable("source") sourceOrAny: String,
+            @RequestParam(name = "latest", defaultValue = "false") latest: Boolean = false,
+            @RequestParam(name = "number", defaultValue = "1") number: Int = 1
+    ): ArticleResponse {
         checkForErrors(sourceOrAny, number)
 
-        val articles = queryDatabaseForArticlesFrom(getSource(sourceOrAny), number)
+        val articles = queryDatabaseForArticlesFrom(getSource(sourceOrAny), latest, number)
 
         return ArticleResponse(articles.size, articles)
     }
 
-    private fun queryDatabaseForArticlesFrom(source: String, number: Int): List<Article> {
+    private fun queryDatabaseForArticlesFrom(source: String, latest: Boolean, number: Int): List<Article> {
         val articles: MutableList<Article> = mutableListOf()
 
         var connection: Connection? = null
@@ -34,7 +37,11 @@ class ArticleController {
 
             statement = connection!!.createStatement()
 
-            val query = "SELECT * FROM \"$source\" LIMIT $number;"
+            val query = if (latest) {
+                "SELECT * FROM \"$source\" LIMIT $number;"
+            } else {
+                "SELECT * FROM \"$source\" ORDER BY RANDOM() LIMIT $number;"
+            }
 
             result = statement!!.executeQuery(query)
 
