@@ -72,7 +72,7 @@ class ArticleControllerTest : ShouldSpec() {
 
                 "for multiple articles from a specified source" {
                     should("respond with the given amount of articles from that source") {
-                        var numArticles= 2
+                        var numArticles = 2
 
                         SOURCES.forEach { source ->
                             val response = ArticleController().get(source, number = numArticles)
@@ -87,8 +87,6 @@ class ArticleControllerTest : ShouldSpec() {
 
                                 article.source shouldBe source
                             }
-
-                            numArticles += 1
                         }
                     }
                 }
