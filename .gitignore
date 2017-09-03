@@ -16,4 +16,5 @@ out/
 ArticleSubscriber1.pem
 
 # API jar
-jar/
+war/
+target/
