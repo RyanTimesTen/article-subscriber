@@ -26,5 +26,5 @@
     :xpath: //h2//a
   :target-blog:
     :base: http://target.github.io/
-    :article_base: ''
+    :article_base: http://
     :xpath: //h2//a
